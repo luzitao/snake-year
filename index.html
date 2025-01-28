@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>祥瑞蛇年 - 动态贺岁</title>
+    <title>祥瑞蛇年 · 新春贺喜</title>
     <style>
         :root {
             --gold-1: #FFF9D2;
             --gold-2: #FFE55C;
             --red-1: #A50000;
             --red-2: #FF3366;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: manipulation;
         }
 
         body {
@@ -26,203 +26,211 @@
             overflow: hidden;
         }
 
-        /* 三维灯笼装饰 */
-        .lantern {
+        /* 性能优化层 */
+        #canvas-container {
             position: fixed;
-            width: 50px;
-            height: 70px;
-            background: var(--red-2);
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            animation: float 4s ease-in-out infinite;
-            
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: -20px;
-                left: 50%;
-                width: 20px;
-                height: 20px;
-                background: var(--gold-2);
-                transform: translateX(-50%);
-                clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-            }
-            
-            @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-20px); }
-            }
+            top: 0;
+            left: 0;
+            z-index: 0;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
-        .lantern:nth-child(1) { left: 10%; top: 5%; }
-        .lantern:nth-child(2) { right: 10%; top: 15%; }
-
         /* 主内容容器 */
-        .container {
+        .content {
             position: relative;
             z-index: 2;
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
         }
 
-        /* 蛇形标题动画 */
+        /* 动态标题 */
         .snake-title {
-            position: relative;
-            font-size: 4rem;
+            font-size: clamp(2rem, 8vw, 4rem);
             text-align: center;
-            margin: 2rem 0;
-            
-            .snake {
-                display: inline-block;
-                animation: snakeMove 3s ease-in-out infinite;
-                filter: drop-shadow(0 0 10px var(--gold-2));
-            }
-
-            .glow {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(circle, var(--gold-1) 20%, transparent 70%);
-                opacity: 0.5;
-                animation: glow 2s ease-in-out infinite;
-            }
+            margin: 1rem 0;
+            color: var(--gold-2);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         /* 祝福语卡片 */
         .blessings {
             display: grid;
-            gap: 1.5rem;
-            padding: 2rem;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+        }
+
+        .blessings p {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            line-height: 1.6;
+            padding: 0.8rem;
             background: linear-gradient(45deg, 
                 rgba(255, 255, 255, 0.1) 0%, 
                 rgba(255, 255, 255, 0.05) 100%);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .content {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
             
-            p {
-                font-size: 1.2rem;
-                line-height: 1.8;
-                color: var(--gold-1);
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                padding: 1rem;
-                background: rgba(0, 0, 0, 0.2);
-                border-radius: 8px;
-                transition: transform 0.3s ease;
-                
-                &:hover {
-                    transform: translateY(-3px);
-                }
+            .blessings p:hover {
+                transform: none !important;
             }
         }
 
-        /* 动态动画定义 */
-        @keyframes snakeMove {
-            0%, 100% { transform: rotate(-15deg) scale(1); }
-            50% { transform: rotate(15deg) scale(1.1); }
-        }
-
-        @keyframes glow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+        /* 性能模式 */
+        .perf-mode {
+            animation: none !important;
+            filter: none !important;
         }
     </style>
 </head>
 <body>
-    <!-- 灯笼装饰 -->
-    <div class="lantern"></div>
-    <div class="lantern"></div>
-
-    <!-- 烟花画布 -->
-    <canvas id="fireworks"></canvas>
-
-    <!-- 主内容 -->
-    <div class="container">
-        <div class="snake-title">
-            <div class="glow"></div>
-            🐍<span class="snake">祥瑞迎春</span>🐍
-        </div>
-
+    <div id="canvas-container"></div>
+    
+    <main class="content">
+        <h1 class="snake-title">🐍 祥瑞迎春 🐉</h1>
+        
         <div class="blessings">
-            <p>🐉 金蛇舞动辞旧岁，祥云瑞气迎新春</p>
-            <p>🎐 事业如蛇腾九霄，步步高升展宏图</p>
-            <p>💰 财源似水连绵至，金银满仓福满门</p>
-            <p>🍎 健康安乐常相伴，岁岁平安万事兴</p>
+            <p>🎉 金蛇起舞辞旧岁，瑞气盈门迎新春</p>
+            <p>📈 事业如蛇腾四海，步步高升展宏图</p>
+            <p>💰 财源似水连绵至，金玉满堂福满门</p>
+            <p>🍎 安康如意常相伴，岁岁平安万事兴</p>
         </div>
-    </div>
+    </main>
 
-    <!-- 高级烟花特效 -->
     <script>
-        class FireworkSystem {
+        // 性能检测
+        const isLowPerf = navigator.hardwareConcurrency < 4 || 
+                        navigator.deviceMemory < 4 ||
+                        /Android|webOS|iPhone|iPad/i.test(navigator.userAgent);
+
+        // 烟花粒子系统（优化版）
+        class Firework {
             constructor() {
-                this.canvas = document.getElementById('fireworks');
+                this.canvas = document.createElement('canvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.particles = [];
+                this.lastFrame = 0;
                 this.init();
             }
 
             init() {
+                this.canvas.style.position = 'fixed';
+                this.canvas.style.top = '0';
+                this.canvas.style.left = '0';
+                this.canvas.style.zIndex = '0';
+                document.getElementById('canvas-container').appendChild(this.canvas);
                 this.resize();
+                
+                const handler = isLowPerf ? 'touchstart' : 'click';
+                this.canvas.addEventListener(handler, (e) => this.spark(e));
                 window.addEventListener('resize', () => this.resize());
-                this.canvas.addEventListener('click', (e) => this.createFirework(e));
+                
                 this.animate();
             }
 
             resize() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
+                this.canvas.width = window.innerWidth * (isLowPerf ? 0.8 : 1);
+                this.canvas.height = window.innerHeight * (isLowPerf ? 0.8 : 1);
             }
 
-            createFirework(e) {
-                const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#FFAFCC'];
-                for(let i = 0; i < 120; i++) {
+            spark(e) {
+                if(this.particles.length > (isLowPerf ? 100 : 200)) return;
+
+                const count = isLowPerf ? 40 : 80;
+                const colors = ['#FFD700', '#FF6B6B', '#4ECDC4'];
+                
+                for(let i = 0; i < count; i++) {
                     this.particles.push({
-                        x: e.clientX,
-                        y: e.clientY,
-                        color: colors[Math.floor(Math.random()*colors.length)],
-                        radius: Math.random() * 3 + 1,
-                        vx: Math.cos((Math.PI * 2 * i)/120) * (Math.random() * 8 + 2),
-                        vy: Math.sin((Math.PI * 2 * i)/120) * (Math.random() * 8 + 2),
-                        life: 1.5
+                        x: e.clientX || e.touches[0].clientX,
+                        y: e.clientY || e.touches[0].clientY,
+                        color: colors[i%3],
+                        radius: Math.random() * 2 + 1,
+                        vx: Math.cos((Math.PI*2*i)/count) * (Math.random()*5 + 2),
+                        vy: Math.sin((Math.PI*2*i)/count) * (Math.random()*5 + 2),
+                        life: 1.2
                     });
                 }
             }
 
-            animate() {
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            animate(timestamp) {
+                if(timestamp - this.lastFrame > (1000/30)) { // 锁定30FPS
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.particles.forEach((p, i) => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.15;
+                        p.life -= 0.02;
 
-                this.particles.forEach((p, i) => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.15;
-                    p.life -= 0.02;
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI*2);
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.fill();
 
-                    this.ctx.beginPath();
-                    this.ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.fill();
-
-                    if(p.life <= 0) this.particles.splice(i, 1);
-                });
-
-                requestAnimationFrame(() => this.animate());
+                        if(p.life <= 0) this.particles.splice(i, 1);
+                    });
+                    
+                    this.lastFrame = timestamp;
+                }
+                requestAnimationFrame((t) => this.animate(t));
             }
         }
 
-        // 初始化系统
-        new FireworkSystem();
+        // 自动性能优化
+        if(isLowPerf) {
+            document.body.classList.add('perf-mode');
+            new Firework(); // 只初始化一个实例
+        } else {
+            new Firework();
+            createSnowflakes();
+        }
 
-        // 自动触发初始烟花
-        setTimeout(() => {
-            const event = { clientX: window.innerWidth/2, clientY: window.innerHeight/2 };
-            new FireworkSystem().createFirework(event);
-        }, 1000);
+        // 雪花效果（仅在非低功耗模式启用）
+        function createSnowflakes() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall {
+                    to { transform: translateY(110vh) rotate(360deg); }
+                }
+                .snow {
+                    position: fixed;
+                    top: -10px;
+                    width: 6px;
+                    height: 6px;
+                    background: rgba(255,255,255,0.8);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    animation: fall linear forwards;
+                }
+            `;
+            document.head.appendChild(style);
+
+            setInterval(() => {
+                const snow = document.createElement('div');
+                snow.className = 'snow';
+                snow.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    animation-duration: ${Math.random() * 4 + 6}s;
+                    opacity: ${Math.random() * 0.6 + 0.4};
+                `;
+                snow.onanimationend = () => snow.remove();
+                document.body.appendChild(snow);
+            }, 300);
+        }
     </script>
 </body>
 </html>
