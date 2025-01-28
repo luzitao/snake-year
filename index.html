@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>祥瑞蛇年 - 动态贺岁</title>
+    <style>
+        :root {
+            --gold-1: #FFF9D2;
+            --gold-2: #FFE55C;
+            --red-1: #A50000;
+            --red-2: #FF3366;
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--red-1) 0%, var(--red-2) 100%);
+            font-family: 'Microsoft YaHei', system-ui;
+            overflow: hidden;
+        }
+
+        /* 三维灯笼装饰 */
+        .lantern {
+            position: fixed;
+            width: 50px;
+            height: 70px;
+            background: var(--red-2);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            animation: float 4s ease-in-out infinite;
+            
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: -20px;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                background: var(--gold-2);
+                transform: translateX(-50%);
+                clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-20px); }
+            }
+        }
+
+        .lantern:nth-child(1) { left: 10%; top: 5%; }
+        .lantern:nth-child(2) { right: 10%; top: 15%; }
+
+        /* 主内容容器 */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 蛇形标题动画 */
+        .snake-title {
+            position: relative;
+            font-size: 4rem;
+            text-align: center;
+            margin: 2rem 0;
+            
+            .snake {
+                display: inline-block;
+                animation: snakeMove 3s ease-in-out infinite;
+                filter: drop-shadow(0 0 10px var(--gold-2));
+            }
+
+            .glow {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, var(--gold-1) 20%, transparent 70%);
+                opacity: 0.5;
+                animation: glow 2s ease-in-out infinite;
+            }
+        }
+
+        /* 祝福语卡片 */
+        .blessings {
+            display: grid;
+            gap: 1.5rem;
+            padding: 2rem;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            
+            p {
+                font-size: 1.2rem;
+                line-height: 1.8;
+                color: var(--gold-1);
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                padding: 1rem;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+                transition: transform 0.3s ease;
+                
+                &:hover {
+                    transform: translateY(-3px);
+                }
+            }
+        }
+
+        /* 动态动画定义 */
+        @keyframes snakeMove {
+            0%, 100% { transform: rotate(-15deg) scale(1); }
+            50% { transform: rotate(15deg) scale(1.1); }
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 灯笼装饰 -->
+    <div class="lantern"></div>
+    <div class="lantern"></div>
+
+    <!-- 烟花画布 -->
+    <canvas id="fireworks"></canvas>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <div class="snake-title">
+            <div class="glow"></div>
+            🐍<span class="snake">祥瑞迎春</span>🐍
+        </div>
+
+        <div class="blessings">
+            <p>🐉 金蛇舞动辞旧岁，祥云瑞气迎新春</p>
+            <p>🎐 事业如蛇腾九霄，步步高升展宏图</p>
+            <p>💰 财源似水连绵至，金银满仓福满门</p>
+            <p>🍎 健康安乐常相伴，岁岁平安万事兴</p>
+        </div>
+    </div>
+
+    <!-- 高级烟花特效 -->
+    <script>
+        class FireworkSystem {
+            constructor() {
+                this.canvas = document.getElementById('fireworks');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.canvas.addEventListener('click', (e) => this.createFirework(e));
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createFirework(e) {
+                const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#FFAFCC'];
+                for(let i = 0; i < 120; i++) {
+                    this.particles.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        color: colors[Math.floor(Math.random()*colors.length)],
+                        radius: Math.random() * 3 + 1,
+                        vx: Math.cos((Math.PI * 2 * i)/120) * (Math.random() * 8 + 2),
+                        vy: Math.sin((Math.PI * 2 * i)/120) * (Math.random() * 8 + 2),
+                        life: 1.5
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15;
+                    p.life -= 0.02;
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.radius * p.life, 0, Math.PI * 2);
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.fill();
+
+                    if(p.life <= 0) this.particles.splice(i, 1);
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // 初始化系统
+        new FireworkSystem();
+
+        // 自动触发初始烟花
+        setTimeout(() => {
+            const event = { clientX: window.innerWidth/2, clientY: window.innerHeight/2 };
+            new FireworkSystem().createFirework(event);
+        }, 1000);
+    </script>
+</body>
+</html>
